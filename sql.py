@@ -87,3 +87,49 @@ with connection.cursor() as cursor:
     cursor.execute(create_ratings_table_query)
     connection.commit()
 
+insert_movies_query = """
+INSERT INTO movies (title, release_year, genre, collection_in_mil)
+VALUES
+    ("Forrest Gump", 1994, "Drama", 330.2),
+    ("3 Idiots", 2009, "Drama", 2.4),
+    ("Eternal Sunshine of the Spotless Mind", 2004, "Drama", 34.5),
+    ("Good Will Hunting", 1997, "Drama", 138.1),
+    ("Skyfall", 2012, "Action", 304.6),
+    ("Gladiator", 2000, "Action", 188.7),
+    ("Black", 2005, "Drama", 3.0),
+    ("Titanic", 1997, "Romance", 659.2),
+    ("The Shawshank Redemption", 1994, "Drama", 28.4),
+    ("Udaan", 2010, "Drama", 1.5),
+    ("Home Alone", 1990, "Comedy", 286.9)
+"""
+
+with connection.cursor() as cursor:
+    cursor.execute(insert_movies_query)
+    connection.commit()
+
+
+select_movies_query = "SELECT * FROM movies LIMIT 5"
+with connection.cursor() as cursor:
+    cursor.execute(select_movies_query)
+    result = cursor.fetchall()
+    for row in result:
+        print(row)
+
+update_query = """  
+UPDATE  
+    reviewers  
+SET  
+    last_name = "Cooper"  
+WHERE  
+    first_name = "Amy"  
+"""
+with connection.cursor() as cursor:
+    cursor.execute(update_query)
+    connection.commit()
+
+
+delete_query = "DELETE FROM ratings WHERE reviewer_id = 2"
+with connection.cursor() as cursor:
+    cursor.execute(delete_query)
+    connection.commit()
+
