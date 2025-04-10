@@ -1,135 +1,46 @@
-import mysql.connector
-from getpass import getpass
-from mysql.connector import Error, connect
+import sqlite3
 
+connection = sqlite3.connect('students.db')
+cursor = connection.cursor()
 
-#def connect_to():
-try:
-    with connect(
-            host="localhost",
-            user=input("Имя пользователя: "),
-            password=getpass("Пароль: "),
-    ) as connection:
-        print(connection)
-except Error as e:
-    print(e)
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS students(
+    id INT(2),
+    name VARCHAR(10),
+    surname VARCHAR(10),
+    sex VARCHAR (1),
+    age INT,
+    mail VARCHAR(30),
+    grade INT,
+    phone_number VARCHAR(10)
 
-
-#def make_a_database():
-try:
-    with connect(
-            host="localhost",
-            user=input("Имя пользователя: "),
-            password=getpass("Пароль: "),
-    ) as connection:
-        create_db_query = "CREATE DATABASE online_movie_rating"
-        with connection.cursor() as cursor:
-            cursor.execute(create_db_query)
-
-except Error as e:\
-    print(e)
-
-
-#def connect_to_database():
-try:
-    with connect(
-            host="localhost",
-            user=input("Имя пользователя: "),
-            password=getpass("Пароль: "),
-            database="online_movie_rating",
-    )as connection:
-        print(connection)
-
-except Error as e:
-        print(e)
-
-
-#def make_a_movie_table():
-create_movies_table_query = """
-CREATE TABLE  movies(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(100),
-    release_year YEAR(4),
-    genre VARCHAR(100),
-    collection_in_mil INT
 )
-"""
-with connection.cursor() as cursor:
-    cursor.execute(create_movies_table_query)
-    connection.commit()
+""")
+connection.commit()
+connection.close()
 
+connection = sqlite3.connect('students.db')
+cursor = connection.cursor()
 
-#def make_a_reviewers_table():
-create_reviewers_table_query = """
-CREATE TABLE  reviewers (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(100),
-    second_name VARCHAR(100)
-)
-"""
-with connection.cursor() as cursor:
-    cursor.execute(create_reviewers_table_query)
-    connection.commit()
-
-
-#def make_a_ratings_table():
-create_ratings_table_query = """
-CREATE TABLE  ratings (
-    movie_id INT,
-    reviewer_id INT,
-    rating DECIMAL(2,1),
-    FOREIGN KEY(movie_id) REFERENCES movies(id),
-    FOREIGN KEY(reviewer_id) REFERENCES reviewers(id),
-    PRIMARY KEY(movie_id, reviewers_id)
-)
-"""
-with connection.cursor() as cursor:
-    cursor.execute(create_ratings_table_query)
-    connection.commit()
-
-insert_movies_query = """
-INSERT INTO movies (title, release_year, genre, collection_in_mil)
+cursor.execute("""INSERT INTO students (id, name, surname, sex, age, mail, grade, phone_number   )
 VALUES
-    ("Forrest Gump", 1994, "Drama", 330.2),
-    ("3 Idiots", 2009, "Drama", 2.4),
-    ("Eternal Sunshine of the Spotless Mind", 2004, "Drama", 34.5),
-    ("Good Will Hunting", 1997, "Drama", 138.1),
-    ("Skyfall", 2012, "Action", 304.6),
-    ("Gladiator", 2000, "Action", 188.7),
-    ("Black", 2005, "Drama", 3.0),
-    ("Titanic", 1997, "Romance", 659.2),
-    ("The Shawshank Redemption", 1994, "Drama", 28.4),
-    ("Udaan", 2010, "Drama", 1.5),
-    ("Home Alone", 1990, "Comedy", 286.9)
-"""
+    (1, "John", "Smith", "M", 19, "john@mail.com", 2, "+79854562535" ),
+    (2, "Emily", "Johnson", "F", 20, "emily@mail.com", 3, "+79123456789"),
+    (3, "Michael", "Williams", "M", 21, "michael@mail.com", 1, "+79098765432"),
+    (4, "Sophia", "Brown", "F", 18, "sophia@mail.com", 2, "+79234567890"),
+    (5, "James", "Davis", "M", 22, "james@mail.com", 4, "+79345678901"),
+    (6,"Olivia", "Miller", "F", 19, "olivia@mail.com", 1, "+79456789012"),
+    (7,"Robert", "Wilson", "M", 20, "robert@mail.com", 3, "+79567890123"),
+    (8,"Ava", "Taylor", "F", 21, "ava@mail.com", 2, "+79678901234")
 
-with connection.cursor() as cursor:
-    cursor.execute(insert_movies_query)
-    connection.commit()
+""")
+connection.commit()
 
+cursor.execute('SELECT * FROM students')
+movies = cursor.fetchall()
 
-select_movies_query = "SELECT * FROM movies LIMIT 5"
-with connection.cursor() as cursor:
-    cursor.execute(select_movies_query)
-    result = cursor.fetchall()
-    for row in result:
-        print(row)
-
-update_query = """  
-UPDATE  
-    reviewers  
-SET  
-    last_name = "Cooper"  
-WHERE  
-    first_name = "Amy"  
-"""
-with connection.cursor() as cursor:
-    cursor.execute(update_query)
-    connection.commit()
+# Выводим результ
 
 
-delete_query = "DELETE FROM ratings WHERE reviewer_id = 2"
-with connection.cursor() as cursor:
-    cursor.execute(delete_query)
-    connection.commit()
-
+connection.commit()
+connection.close()
