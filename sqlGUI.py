@@ -1,20 +1,42 @@
 import sys
+from io import text_encoding
+import re
+from PyQt5 import Qt
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout,
-                             QMessageBox, QHBoxLayout)
+                             QMessageBox, QHBoxLayout, QFrame)
+import sqlite3
+from sql import get_students
 
 # База данных пользователей (логин, пароль)
 user_db = [["admin", "admin"], ["prof", "123"], ["void", "100"]]
+
 
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('БД Студенты')
-        self.setGeometry(200, 200, 400, 300)
+        self.setGeometry(600, 600, 600, 600)
+
+        main_font=QFont("Arial", 12)
+        db_label = QLabel(self)
+        text_from_db=get_students()
+        trash={"]", "["}
+        text_from_db=''.join(char for char in text_from_db if char not in trash)
+
+        parts = text_from_db.split("),")
+        formatted_text = "),\n".join(parts)
+        db_label.setText(formatted_text)
+        db_label.move(50, 50)
+        db_label.setFrameStyle(QFrame.Box | QFrame.Plain)
+        db_label.setFont(main_font)
+
+        hat_label = QLabel("ID   Имя   Фам-ия   Пол   Эл.Почта   Курс   Телефон ",self)
+        hat_label.move(50,25)
+        hat_label.setFont(main_font)
 
 
-        label = QLabel('Добро пожаловать!', self)
-        label.move(50, 50)
 
 
 class LoginWindow(QWidget):

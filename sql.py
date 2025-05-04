@@ -35,12 +35,20 @@ VALUES
 
 """)
 connection.commit()
-
-cursor.execute('SELECT * FROM students')
-movies = cursor.fetchall()
-
-# Выводим результ
-
-
-connection.commit()
 connection.close()
+
+
+def get_students():
+    connection = sqlite3.connect('students.db')
+    cursor = connection.cursor()
+    cursor.execute('SELECT * FROM students')
+    student = cursor.fetchall()
+    connection.commit()
+    connection.close()
+    if student:
+        return f' {student}'
+    else:
+        return "no data"
+
+
+
