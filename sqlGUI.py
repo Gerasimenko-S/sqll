@@ -86,7 +86,6 @@ class LoginWindow(QWidget):
         for user in user_db:
             if user[0] == login and user[1] == password:
                 auth = True
-
                 break
 
         if auth:

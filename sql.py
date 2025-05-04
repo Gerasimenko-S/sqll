@@ -28,7 +28,7 @@ VALUES
     (2, "Emily", "Johnson", "F", 20, "emily@mail.com", 3, "+79123456789"),
     (3, "Michael", "Williams", "M", 21, "michael@mail.com", 1, "+79098765432"),
     (4, "Sophia", "Brown", "F", 18, "sophia@mail.com", 2, "+79234567890"),
-    (5, "James", "Davjis", "M", 22, "james@mail.com", 4, "+79345678901"),
+    (5, "James", "Davis", "M", 22, "james@mail.com", 4, "+79345678901"),
     (6,"Olivia", "Miller", "F", 19, "olivia@mail.com", 1, "+79456789012"),
     (7,"Robert", "Wilson", "M", 20, "robert@mail.com", 3, "+79567890123"),
     (8,"Ava", "Taylor", "F", 21, "ava@mail.com", 2, "+79678901234")
