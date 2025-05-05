@@ -61,8 +61,7 @@ def delete_student_sql(student_id):
     cursor.execute("DELETE FROM students WHERE id = ?", (student_id,))
     connection.commit()
     return True
-    connection.commit()
-    connection.close()
+
 
 
 

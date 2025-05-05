@@ -1,6 +1,7 @@
 import sys
 import re
 from PyQt5 import Qt
+from PyQt5.QtCore import center
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout,
                              QMessageBox, QHBoxLayout, QFrame, QTableWidget, QTableWidgetItem, QInputDialog)
@@ -19,15 +20,14 @@ class MainWindow(QWidget):
         self.btn_refresh = QPushButton("Обновить")
         self.setWindowTitle('БД Студенты')
         self.setGeometry(600, 600, 600, 600)
+        self.setFixedSize(600, 600)
         self.setStyleSheet("background-color: #d0f4f7;")
 
-        # Создаем таблицу
-        self.table = QTableWidget(self)
 
-        # Получаем данные
+        self.table = QTableWidget(self)
+        self.table.setFixedHeight(300)
         students_data = get_students()
 
-        # Настраиваем таблицу
         if students_data and students_data != "no data":
             if isinstance(students_data, str):
                 try:
@@ -55,28 +55,40 @@ class MainWindow(QWidget):
 
         # Создаем кнопки и layout
         self.create_buttons()
-        self.setup_layout()  # Это ключевая строка, которую вы пропустили
-
+        self.setup_layout()
 
     def setup_layout(self):
-        # Горизонтальный layout для кнопок
-        button_layout = QHBoxLayout()
-       # button_layout.addWidget(self.btn_refresh)
-       # button_layout.addWidget(self.btn_add)
-        button_layout.addWidget(self.btn_delete)
+        # Основной горизонтальный layout
+        main_layout = QVBoxLayout(self)
 
-        # Основной вертикальный layout
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(self.table)
-        main_layout.addLayout(button_layout)
+        # Layout для кнопок (левая часть)
+        buttons_layout = QVBoxLayout()
+        buttons_layout.addWidget(self.btn_delete)
+        buttons_layout.addWidget(self.btn_add)
+        buttons_layout.addWidget(self.btn_refresh)
+        buttons_layout.setSpacing(15)  # Уменьшенное расстояние между кнопками
+        buttons_layout.setContentsMargins(0, 0, 0, 0)  # Убираем отступы
+        self.btn_delete.setFixedWidth(100)  # Фиксированная ширина
+        self.btn_add.setFixedWidth(100)
+        self.btn_refresh.setFixedWidth(100)
+        buttons_layout.addStretch()
 
-        # Устанавливаем layout для главного окна
+
+        # Layout для таблицы (правая часть)
+        table_layout = QVBoxLayout()
+        table_layout.addWidget(self.table)
+        main_layout.addLayout(buttons_layout, stretch=1)
+        main_layout.addLayout(table_layout, stretch=5)
+        # Добавляем оба layout в основной
+        main_layout.addLayout(buttons_layout)
+        main_layout.addLayout(table_layout)
+
         self.setLayout(main_layout)
 
     def create_buttons(self):
         self.btn_delete = QPushButton("Удалить", self)
         self.btn_delete.clicked.connect(self.delete_student)
-        self.btn_delete.setEnabled(False)
+        self.btn_delete.setEnabled(True)
 
 
     def delete_student(self):
@@ -94,7 +106,7 @@ class MainWindow(QWidget):
             if reply == QMessageBox.Yes:
                 print(f"Удаляем студента ID {student_id}")
                 delete_student_sql(student_id)
-                self.refresh_data()
+
 
 
 class LoginWindow(QWidget):
