@@ -34,6 +34,7 @@ VALUES
     (8,"Ava", "Taylor", "F", 21, "ava@mail.com", 2, "+79678901234")
 
 """)
+student = cursor.fetchall()
 connection.commit()
 connection.close()
 
@@ -43,12 +44,25 @@ def get_students():
     cursor = connection.cursor()
     cursor.execute('SELECT * FROM students')
     student = cursor.fetchall()
-    connection.commit()
-    connection.close()
+
     if student:
         return f' {student}'
     else:
         return "no data"
+
+    connection.commit()
+    connection.close()
+
+
+def delete_student_sql(student_id):
+    connection = sqlite3.connect('students.db')
+    cursor = connection.cursor()
+
+    cursor.execute("DELETE FROM students WHERE id = ?", (student_id,))
+    connection.commit()
+    return True
+    connection.commit()
+    connection.close()
 
 
 

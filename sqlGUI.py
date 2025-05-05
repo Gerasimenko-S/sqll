@@ -1,42 +1,100 @@
 import sys
-from io import text_encoding
 import re
 from PyQt5 import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout,
-                             QMessageBox, QHBoxLayout, QFrame)
+                             QMessageBox, QHBoxLayout, QFrame, QTableWidget, QTableWidgetItem, QInputDialog)
 import sqlite3
-from sql import get_students
+from sql import get_students, delete_student_sql
 
 # База данных пользователей (логин, пароль)
-user_db = [["admin", "admin"], ["prof", "123"], ["void", "100"]]
-
+user_db = [["admin", "admin", 3], ["prof", "123", 2], ["void", "100", 1]]
 
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+        self.btn_delete = QPushButton("Удалить")
+        self.btn_add = QPushButton("Добавить")
+        self.btn_refresh = QPushButton("Обновить")
         self.setWindowTitle('БД Студенты')
         self.setGeometry(600, 600, 600, 600)
+        self.setStyleSheet("background-color: #d0f4f7;")
 
-        main_font=QFont("Arial", 12)
-        db_label = QLabel(self)
-        text_from_db=get_students()
-        trash={"]", "["}
-        text_from_db=''.join(char for char in text_from_db if char not in trash)
+        # Создаем таблицу
+        self.table = QTableWidget(self)
 
-        parts = text_from_db.split("),")
-        formatted_text = "),\n".join(parts)
-        db_label.setText(formatted_text)
-        db_label.move(50, 50)
-        db_label.setFrameStyle(QFrame.Box | QFrame.Plain)
-        db_label.setFont(main_font)
+        # Получаем данные
+        students_data = get_students()
 
-        hat_label = QLabel("ID   Имя   Фам-ия   Пол   Эл.Почта   Курс   Телефон ",self)
-        hat_label.move(50,25)
-        hat_label.setFont(main_font)
+        # Настраиваем таблицу
+        if students_data and students_data != "no data":
+            if isinstance(students_data, str):
+                try:
+                    students_data = eval(students_data)
+                except:
+                    students_data = []
+
+        if students_data and isinstance(students_data, (list, tuple)):
+            self.table.setRowCount(len(students_data))
+            self.table.setColumnCount(8)
+            headers = ["ID", "Name", "Surname", "Sex", "Age", "Email", "Grade", "Phone"]
+            self.table.setHorizontalHeaderLabels(headers)
+
+            for row_idx, student in enumerate(students_data):
+                for col_idx, value in enumerate(student):
+                    item = QTableWidgetItem(str(value))
+                    self.table.setItem(row_idx, col_idx, item)
+
+            self.table.resizeColumnsToContents()
+            self.table.setAlternatingRowColors(True)
+            self.table.setStyleSheet("alternate-background-color: #a0e1e8;")
+        else:
+            no_data_label = QLabel("Нет данных для отображения", self)
+            no_data_label.move(50, 50)
+
+        # Создаем кнопки и layout
+        self.create_buttons()
+        self.setup_layout()  # Это ключевая строка, которую вы пропустили
 
 
+    def setup_layout(self):
+        # Горизонтальный layout для кнопок
+        button_layout = QHBoxLayout()
+       # button_layout.addWidget(self.btn_refresh)
+       # button_layout.addWidget(self.btn_add)
+        button_layout.addWidget(self.btn_delete)
+
+        # Основной вертикальный layout
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.table)
+        main_layout.addLayout(button_layout)
+
+        # Устанавливаем layout для главного окна
+        self.setLayout(main_layout)
+
+    def create_buttons(self):
+        self.btn_delete = QPushButton("Удалить", self)
+        self.btn_delete.clicked.connect(self.delete_student)
+        self.btn_delete.setEnabled(False)
+
+
+    def delete_student(self):
+        selected = self.table.selectedItems()
+        if selected:
+            row = selected[0].row()
+            student_id = self.table.item(row, 0).text()
+
+            reply = QMessageBox.question(
+                self, 'Подтверждение',
+                f"Удалить студента ID {student_id}?",
+                QMessageBox.Yes | QMessageBox.No
+            )
+
+            if reply == QMessageBox.Yes:
+                print(f"Удаляем студента ID {student_id}")
+                delete_student_sql(student_id)
+                self.refresh_data()
 
 
 class LoginWindow(QWidget):
@@ -56,10 +114,8 @@ class LoginWindow(QWidget):
         self.edit_password = QLineEdit()
         self.edit_password.setPlaceholderText('Введите ваш пароль')
 
-
         self.button_login = QPushButton('Войти')
         self.button_login.clicked.connect(self.on_login_clicked)
-
 
         layout = QVBoxLayout()
 
@@ -68,7 +124,6 @@ class LoginWindow(QWidget):
 
         layout.addWidget(self.label_password)
         layout.addWidget(self.edit_password)
-
 
         h_layout = QHBoxLayout()
         h_layout.addStretch()
