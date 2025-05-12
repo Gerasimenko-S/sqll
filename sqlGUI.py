@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QPushButt
 import sqlite3
 from sql import get_students, delete_student_sql
 
-# База данных пользователей (логин, пароль)
+
 user_db = [["admin", "admin", 3], ["prof", "123", 2], ["void", "100", 1]]
 
 
@@ -48,38 +48,36 @@ class MainWindow(QWidget):
 
             self.table.resizeColumnsToContents()
             self.table.setAlternatingRowColors(True)
-            self.table.setStyleSheet("alternate-background-color: #a0e1e8;")
+            self.table.setStyleSheet("alternate-background-color: #a0e1e8; background-color: #65bfb9;")
         else:
             no_data_label = QLabel("Нет данных для отображения", self)
             no_data_label.move(50, 50)
 
-        # Создаем кнопки и layout
         self.create_buttons()
         self.setup_layout()
 
     def setup_layout(self):
-        # Основной горизонтальный layout
+
         main_layout = QVBoxLayout(self)
 
-        # Layout для кнопок (левая часть)
+
         buttons_layout = QVBoxLayout()
         buttons_layout.addWidget(self.btn_delete)
         buttons_layout.addWidget(self.btn_add)
         buttons_layout.addWidget(self.btn_refresh)
-        buttons_layout.setSpacing(15)  # Уменьшенное расстояние между кнопками
-        buttons_layout.setContentsMargins(0, 0, 0, 0)  # Убираем отступы
-        self.btn_delete.setFixedWidth(100)  # Фиксированная ширина
+        buttons_layout.setSpacing(15)
+        buttons_layout.setContentsMargins(0, 0, 0, 0)
+        self.btn_delete.setFixedWidth(100)
         self.btn_add.setFixedWidth(100)
         self.btn_refresh.setFixedWidth(100)
         buttons_layout.addStretch()
 
 
-        # Layout для таблицы (правая часть)
         table_layout = QVBoxLayout()
         table_layout.addWidget(self.table)
         main_layout.addLayout(buttons_layout, stretch=1)
         main_layout.addLayout(table_layout, stretch=5)
-        # Добавляем оба layout в основной
+
         main_layout.addLayout(buttons_layout)
         main_layout.addLayout(table_layout)
 
@@ -117,7 +115,6 @@ class LoginWindow(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        # Создаем элементы интерфейса
         self.label_login = QLabel('Логин:')
         self.edit_login = QLineEdit()
         self.edit_login.setPlaceholderText('Введите ваш логин')
@@ -159,6 +156,7 @@ class LoginWindow(QWidget):
             self.main_window = MainWindow()
             self.main_window.show()
             self.close()
+            return True
         else:
             QMessageBox.warning(self, 'Ошибка', 'Отклонено в доступе или такой учетной записи не существует')
 
