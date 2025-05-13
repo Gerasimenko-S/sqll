@@ -19,8 +19,8 @@ class MainWindow(QWidget):
         self.btn_add = QPushButton("Добавить")
         self.btn_refresh = QPushButton("Обновить")
         self.setWindowTitle('БД Студенты')
-        self.setGeometry(600, 600, 600, 600)
-        self.setFixedSize(600, 600)
+        self.setGeometry(600, 450, 600, 600)
+        self.setFixedSize(600, 450)
         self.setStyleSheet("background-color: #d0f4f7;")
 
 
@@ -86,8 +86,19 @@ class MainWindow(QWidget):
     def create_buttons(self):
         self.btn_delete = QPushButton("Удалить", self)
         self.btn_delete.clicked.connect(self.delete_student)
-        self.btn_delete.setEnabled(True)
+        self.btn_add = QPushButton("Добавить", self)
+        self.btn_refresh = QPushButton("Обновить", self)
+        self.btn_refresh.setEnabled(True)
+        if user_db[2] == 3:
+            self.btn_delete.setEnabled(True)
+            self.btn_add.setEnabled(True)
 
+        if user_db[2] == 2:
+            self.btn_delete.setEnabled(False)
+            self.btn_add.setEnabled(True)
+        if user_db[2] == 1:
+            self.btn_delete.setEnabled(False)
+            self.btn_add.setEnabled(False)
 
     def delete_student(self):
         selected = self.table.selectedItems()
@@ -103,8 +114,26 @@ class MainWindow(QWidget):
 
             if reply == QMessageBox.Yes:
                 print(f"Удаляем студента ID {student_id}")
+                self.table.removeRow(row)
                 delete_student_sql(student_id)
 
+
+    def refresh_table(self):
+        students_data = get_students()
+        self.table.setRowCount(0)
+
+        if students_data and students_data != "no data":
+            if isinstance(students_data, str):
+                try:
+                    students_data = eval(students_data)
+                except:
+                    students_data = []
+
+            self.table.setRowCount(len(students_data))
+            for row_idx, student in enumerate(students_data):
+                for col_idx, value in enumerate(student):
+                    item = QTableWidgetItem(str(value))
+                    self.table.setItem(row_idx, col_idx, item)
 
 
 class LoginWindow(QWidget):
