@@ -26,6 +26,7 @@ class MainWindow(QWidget):
 
         self.table = QTableWidget(self)
         self.table.setFixedHeight(300)
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         students_data = get_students()
 
         if students_data and students_data != "no data":
@@ -37,8 +38,8 @@ class MainWindow(QWidget):
 
         if students_data and isinstance(students_data, (list, tuple)):
             self.table.setRowCount(len(students_data))
-            self.table.setColumnCount(8)
-            headers = ["ID", "Name", "Surname", "Sex", "Age", "Email", "Grade", "Phone"]
+            self.table.setColumnCount(10)
+            headers = ["ID", "Name", "Surname", "Sex", "Age", "Email", "Grade", "Phone", "Group", "Form"]
             self.table.setHorizontalHeaderLabels(headers)
 
             for row_idx, student in enumerate(students_data):
