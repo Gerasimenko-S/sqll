@@ -4,8 +4,6 @@ from sqlGUI import LoginWindow, MainWindow, user_db, delete_student_sql, get_stu
 import sqlite3
 import sys
 
-
-
 @pytest.fixture(scope="session")
 def sqlapp():
     app = QApplication(sys.argv)
@@ -19,20 +17,16 @@ def test_login_right(sqlapp):
     login_window.edit_password.setText("admin1")
     assert login_window.on_login_clicked() == True
 
-
-
 def test_login_wrong(sqlapp):
     login_window = LoginWindow()
     login_window.edit_login.setText("admin")
     login_window.edit_password.setText("admin")
     assert login_window.on_login_clicked() is None
 
-
 def test_window_open(sqlapp, monkeypatch):
     login_window = LoginWindow()
     login_window.edit_login.setText("admin")
     login_window.edit_password.setText("admin")
-
 
     mock_mainwindow = None
 
@@ -75,10 +69,8 @@ def test_delete_student_from_db():
     connection.commit()
     connection.close()
 
-
     students_before = get_students()
     assert "'Test'" in students_before
-
 
     delete_student_sql(99)
 
