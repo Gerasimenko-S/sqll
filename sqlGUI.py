@@ -10,6 +10,9 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QPushButt
 import sqlite3
 from sql import get_students, delete_student_sql
 user_db = [["admin", "admin", 3], ["prof", "123", 2], ["void", "100", 1]]
+
+
+
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -44,7 +47,7 @@ class MainWindow(QWidget):
         if students_data and isinstance(students_data, (list, tuple)):
             self.table.setRowCount(len(students_data))
             self.table.setColumnCount(10)
-            headers = ["ID", "Name", "Surname", "Sex", "Age", "Email", "Grade", "Phone", "Group", "Form"]
+            headers = ["ID", "Name", "Surname", "Gend", "Age", "Email", "Grade", "Phone", "Group", "Form"]
             self.table.setHorizontalHeaderLabels(headers)
 
             for row_idx, student in enumerate(students_data):
@@ -85,7 +88,7 @@ class MainWindow(QWidget):
         right_layout.addSpacing(20)
         right_layout.addWidget(QLabel("Поиск:"))
         right_layout.addWidget(self.search_edit)
-        right_layout.addWidget(self.search_button)  # Добавляем кнопку
+        right_layout.addWidget(self.search_button)
         right_layout.addStretch()
 
         self.right_panel.setLayout(right_layout)
@@ -115,7 +118,7 @@ class MainWindow(QWidget):
     def create_buttons(self):
         self.btn_delete.clicked.connect(self.delete_student)
         self.btn_refresh.clicked.connect(self.refresh_table)
-
+        self.btn_add.clicked.connect(self.add_student)
 
     def current_user_commit(self, i=None):
             if current_user == user_db[i][0]:
@@ -132,14 +135,14 @@ class MainWindow(QWidget):
             except:
                 students_data = []
 
-        if index == 0:  # По умолчанию (ID)
+        if index == 0:
             sorted_data = sorted(students_data, key=lambda x: x[0])
-        elif index == 1:  # По курсу
-            sorted_data = sorted(students_data, key=lambda x: x[6])  # grade
-        elif index == 2:  # По возрасту
-            sorted_data = sorted(students_data, key=lambda x: x[4])  # age
-        elif index == 3:  # По группе
-            sorted_data = sorted(students_data, key=lambda x: x[8])  # group
+        elif index == 1:
+            sorted_data = sorted(students_data, key=lambda x: x[6])
+        elif index == 2:
+            sorted_data = sorted(students_data, key=lambda x: x[4])
+        elif index == 3:
+            sorted_data = sorted(students_data, key=lambda x: x[8])
 
 
         self.table.setRowCount(0)
@@ -194,6 +197,7 @@ class MainWindow(QWidget):
 
         except Exception as e:
             QMessageBox.critical(self, "Ошибка поиска", f"Ошибка при поиске: {str(e)}")
+
     def delete_student(self):
         selected = self.table.selectedItems()
         if selected:
@@ -210,6 +214,52 @@ class MainWindow(QWidget):
                 self.table.removeRow(row)
                 delete_student_sql(student_id)
 
+    def add_student(self):
+        try:
+            dialog = QInputDialog(self)
+            dialog.setWindowTitle("Добавить студента")
+            dialog.setLabelText(
+                "Введите данные через запятую:\nИмя,Фамилия,Пол(M/F),Возраст,Email,Курс,Телефон,Группа,Форма(Б/К/Ц/ВБ)")
+
+            if dialog.exec_():
+                input_data = dialog.textValue()
+                data = [x.strip() for x in input_data.split(',')]
+
+                if len(data) != 9:
+                    raise ValueError("Нужно ввести ровно 9 параметров")
+
+
+                if data[2] not in ['M', 'F']:
+                    raise ValueError("Пол должен быть M или F")
+
+                if not data[3].isdigit() or not data[5].isdigit():
+                    raise ValueError("Возраст и курс должны быть числами")
+
+                if self.save_to_database(data):
+                    self.refresh_table()
+                    QMessageBox.information(self, "Успех", "Студент добавлен")
+
+        except ValueError as ve:
+            QMessageBox.warning(self, "Ошибка ввода", str(ve))
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Ошибка: {str(e)}")
+    def save_to_database(self, student_data):
+        try:
+            connection = sqlite3.connect('students.db')
+            cursor = connection.cursor()
+
+            # SQL-запрос для вставки данных
+            cursor.execute("""
+            INSERT INTO students (name, surname, gend, age, mail, grade, phone_number, grupa, form)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, student_data)
+
+            connection.commit()
+            connection.close()
+            return True
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка БД", f"Ошибка при сохранении: {str(e)}")
+            return False
     def refresh_table(self):
         students_data = get_students()
         self.table.setRowCount(0)

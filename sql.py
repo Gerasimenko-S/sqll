@@ -7,13 +7,13 @@ cursor.execute("""
 CREATE TABLE IF NOT EXISTS students(
     id INT(2),
     name VARCHAR(10),
-    surname VARCHAR(10),
-    sex VARCHAR (1),
+    surname VARCHAR(15),
+    gend VARCHAR (1),
     age INT,
     mail VARCHAR(30),
     grade INT,
     phone_number VARCHAR(10),
-    grupa VARCHAR(10),
+    grupa VARCHAR(3),
     form VARCHAR(3)
 
 )
@@ -24,9 +24,9 @@ connection.close()
 connection = sqlite3.connect('students.db')
 cursor = connection.cursor()
 
-cursor.execute("""INSERT INTO students (id, name, surname, sex, age, mail, grade, phone_number, grupa, form)
+cursor.execute("""INSERT INTO students (id, name, surname, gend, age, mail, grade, phone_number, grupa, form)
 VALUES
-     (1, "Елена", "Филатова", "F", 19, "elena@mail.com", 2, "+79854562535", "A1", "Б"),
+    (1, "Елена", "Филатова", "F", 19, "elena@mail.com", 2, "+79854562535", "A1", "Б"),
     (2, "Иван", "Петров", "M", 20, "ivan@mail.com", 3, "+79123456789", "B2", "ВБ"),
     (3, "Анна", "Смирнова", "F", 18, "anna@mail.com", 1, "+79098765432", "A1", "ВБ"),
     (4, "Дмитрий", "Козлов", "M", 21, "dmitry@mail.com", 4, "+79234567890", "C3", "Ц"),
@@ -75,7 +75,6 @@ def delete_student_sql(student_id):
     cursor.execute("DELETE FROM students WHERE id = ?", (student_id,))
     connection.commit()
     return True
-
 
 
 
