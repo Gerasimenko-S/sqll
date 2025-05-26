@@ -21,8 +21,11 @@ class MainWindow(QWidget):
         self.btn_refresh = QPushButton("Обновить")
         self.setWindowTitle('БД Студенты')
         self.setGeometry(600, 450, 800, 600)
-        self.setFixedSize(800, 600)
+        self.setFixedSize(800, 550)
         self.setStyleSheet("background-color: #d0f4f7;")
+
+        self.current_user_label = QLabel()
+        self.current_user_label.setAlignment(QtCoreQt.AlignCenter)
 
         self.table = QTableWidget(self)
         self.table.setFixedHeight(400)
@@ -36,14 +39,12 @@ class MainWindow(QWidget):
 
     def load_student_data(self):
         students_data = get_students()
-
         if students_data and students_data != "no data":
             if isinstance(students_data, str):
                 try:
                     students_data = eval(students_data)
                 except:
                     students_data = []
-
         if students_data and isinstance(students_data, (list, tuple)):
             self.table.setRowCount(len(students_data))
             self.table.setColumnCount(10)
@@ -54,7 +55,6 @@ class MainWindow(QWidget):
                 for col_idx, value in enumerate(student):
                     item = QTableWidgetItem(str(value))
                     self.table.setItem(row_idx, col_idx, item)
-
             self.table.resizeColumnsToContents()
             self.table.setAlternatingRowColors(True)
             self.table.setStyleSheet("alternate-background-color: #a0e1e8; background-color: #65bfb9;")
@@ -76,7 +76,7 @@ class MainWindow(QWidget):
 
 
         self.search_button = QPushButton("Найти")
-        self.search_button.setStyleSheet("padding: 5px; background-color: #a0e1e8; color: black;")
+        self.search_button.setStyleSheet("padding: 5px; background-color: #65bfb9; color: black;")
         self.search_button.clicked.connect(self.execute_search)
 
 
@@ -97,19 +97,23 @@ class MainWindow(QWidget):
         main_layout = QHBoxLayout(self)
 
         left_layout = QVBoxLayout()
-
-        buttons_layout = QVBoxLayout()
+        user_controls = QVBoxLayout()
+        user_controls.addWidget(self.current_user_label)
+        buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(self.btn_delete)
         buttons_layout.addWidget(self.btn_add)
         buttons_layout.addWidget(self.btn_refresh)
-        buttons_layout.setSpacing(15)
+        buttons_layout.setSpacing(30)
         buttons_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.btn_delete.setFixedWidth(100)
-        self.btn_add.setFixedWidth(100)
-        self.btn_refresh.setFixedWidth(100)
-
-        left_layout.addLayout(buttons_layout)
+        self.btn_delete.setFixedSize(100,50)
+        self.btn_add.setFixedSize(100,50)
+        self.btn_refresh.setFixedSize(100,50)
+        self.btn_delete.setStyleSheet("background-color: #65bfb9; color: black;")
+        self.btn_add.setStyleSheet("background-color: #65bfb9; color: black;")
+        self.btn_refresh.setStyleSheet("background-color: #65bfb9; color: black;")
+        user_controls.addLayout(buttons_layout)
+        left_layout.addLayout(user_controls)
         left_layout.addWidget(self.table)
 
         main_layout.addLayout(left_layout)
@@ -219,7 +223,7 @@ class MainWindow(QWidget):
             dialog = QInputDialog(self)
             dialog.setWindowTitle("Добавить студента")
             dialog.setLabelText(
-                "Введите данные через запятую:\nИмя,Фамилия,Пол(M/F),Возраст,Email,Курс,Телефон,Группа,Форма(Б/К/Ц/ВБ)")
+                "Введите данные через запятую:\nИмя,Фамилия,Пол(M/Ж),Возраст,Email,Курс,Телефон,Группа,Форма(Б/К/Ц/ВБ)")
 
             if dialog.exec_():
                 input_data = dialog.textValue()
@@ -229,8 +233,8 @@ class MainWindow(QWidget):
                     raise ValueError("Нужно ввести ровно 9 параметров")
 
 
-                if data[2] not in ['M', 'F']:
-                    raise ValueError("Пол должен быть M или F")
+                if data[2] not in ['М', 'Ж']:
+                    raise ValueError("Пол должен быть M или Ж")
 
                 if not data[3].isdigit() or not data[5].isdigit():
                     raise ValueError("Возраст и курс должны быть числами")
@@ -311,6 +315,7 @@ class LoginWindow(QWidget):
         layout.addLayout(h_layout)
         self.setLayout(layout)
 
+
     def on_login_clicked(self):
         login = self.edit_login.text()
         password = self.edit_password.text()
@@ -319,16 +324,17 @@ class LoginWindow(QWidget):
             if user[0] == login and user[1] == password:
                 auth = True
                 global current_user
-                current_user=login
+                current_user = login
                 break
 
         if auth:
             self.main_window = MainWindow()
+            # Устанавливаем текст лейбла
+            self.main_window.current_user_label.setText(f"Текущий пользователь: {current_user}")
             self.main_window.show()
             self.close()
         else:
             QMessageBox.warning(self, 'Ошибка', 'Неверные данные или доступ отклонен')
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -47,7 +47,7 @@ def test_delete_student_from_db():
     cursor = connection.cursor()
     cursor.execute(
         "INSERT INTO students (id, name, surname, gend, age, mail, grade, phone_number)"
-        " VALUES (99, 'Test', 'Student', 'M', 20, 'test@mail.com', 1, '1234567890')")
+        " VALUES (99, 'Test', 'Student', 'М', 20, 'test@mail.com', 1, '1234567890')")
     connection.commit()
     connection.close()
 
@@ -73,5 +73,5 @@ def test_add_student_invalid_input():
 
         # Проверяем что было показано сообщение об ошибке
         mock_warning.assert_called_once()
-        assert "Пол должен быть M или F" in mock_warning.call_args[0][2] or \
+        assert "Пол должен быть M или Ж" in mock_warning.call_args[0][2] or \
                "Возраст и курс должны быть числами" in mock_warning.call_args[0][2]
