@@ -1,5 +1,4 @@
 from unittest.mock import patch
-
 import pytest
 from PyQt5.QtWidgets import QApplication, QMessageBox, QInputDialog
 from sqlGUI import LoginWindow, MainWindow, user_db, delete_student_sql, get_students
@@ -16,14 +15,14 @@ def sqlapp():
 def test_login_right(sqlapp):
     login_window = LoginWindow()
     login_window.edit_login.setText("admin")
-    login_window.edit_password.setText("admin1")
+    login_window.edit_password.setText("admin")
     assert login_window.on_login_clicked() == True
 
-'''def test_login_wrong(sqlapp):
+def test_login_wrong(sqlapp):
     login_window = LoginWindow()
     login_window.edit_login.setText("admin")
-    login_window.edit_password.setText("admin")
-    assert login_window.on_login_clicked() is None'''
+    login_window.edit_password.setText("admin1")
+    assert login_window.on_login_clicked() is None
 
 def test_window_open(sqlapp, monkeypatch):
     login_window = LoginWindow()
@@ -61,17 +60,17 @@ def test_delete_student_from_db():
 
 
 def test_add_student_invalid_input():
-    """Тест обработки некорректного ввода"""
+
     app = MainWindow()
 
-    # Мокируем с неправильным полом и нечисловым возрастом
+
     with patch.object(QInputDialog, 'exec_', return_value=True), \
             patch.object(QInputDialog, 'textValue',
                          return_value="Иван,Иванов,X,двадцать,ivan@mail.com,2,+79123456789,A101,Б"), \
             patch.object(QMessageBox, 'warning') as mock_warning:
         app.add_student()
 
-        # Проверяем что было показано сообщение об ошибке
+
         mock_warning.assert_called_once()
         assert "Пол должен быть M или Ж" in mock_warning.call_args[0][2] or \
                "Возраст и курс должны быть числами" in mock_warning.call_args[0][2]

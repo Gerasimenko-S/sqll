@@ -69,18 +69,15 @@ class MainWindow(QWidget):
         self.filter_combo.setCurrentIndex(0)
         self.filter_combo.currentIndexChanged.connect(self.apply_filter)
 
-
         self.search_edit = QLineEdit()
         self.search_edit.setPlaceholderText("Введите для поиска...")
         self.search_edit.setStyleSheet("padding: 5px;")
-
 
         self.search_button = QPushButton("Найти")
         self.search_button.setStyleSheet("padding: 5px; background-color: #65bfb9; color: black;")
         self.search_button.clicked.connect(self.execute_search)
 
-
-        self.search_edit.returnPressed.connect(self.execute_search)
+        #self.search_edit.returnPressed.connect(self.execute_search)
 
         right_layout = QVBoxLayout()
         right_layout.addWidget(QLabel("Фильтры:"))
@@ -92,7 +89,6 @@ class MainWindow(QWidget):
         right_layout.addStretch()
 
         self.right_panel.setLayout(right_layout)
-
     def setup_layout(self):
         main_layout = QHBoxLayout(self)
 
@@ -333,9 +329,10 @@ class LoginWindow(QWidget):
             self.main_window.current_user_label.setText(f"Текущий пользователь: {current_user}")
             self.main_window.show()
             self.close()
+            return True
         else:
             QMessageBox.warning(self, 'Ошибка', 'Неверные данные или доступ отклонен')
-
+            return None
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = LoginWindow()
